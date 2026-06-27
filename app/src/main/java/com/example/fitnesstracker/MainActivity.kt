@@ -73,6 +73,101 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         btnRefreshChart.setOnClickListener { setupChart() }
     }
 
-    override fun
+    override fun onResume() {
+        super.onResume()
+        accelerometer?.let { sensorManager.registerListener(this, it, sensorManager.SENSOR_DELAY_FASTEST)}
+        gyroscope?.let { sensorManager.registerListener(this, it, sensorManager.SENSOR_DELAY_FASTEST)}
+        magnetometer?.let { sensorManager.registerListener(this, it, sensorManager.SENSOR_DELAY_FASTEST)}
+    }
+
+    override fun onPause(){
+        super.onPause()
+        sensorManager.unregisterListener(this)
+    }
+
+    // FINAL: add onStop() override + call unregisterListener(this)
+
+    private fun initSensors() {
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
+        magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
+    }
+
+    // Assignment 1: add the 3 sensor cases
+    override fun onSensorChanged(event: SensorEvent) {
+        when (event.sensor.type) {
+            // TODO Case 1: TYPE_ACCELEROMETER: store accelValues, call handleAcceletometer()
+            // TODO Case 2: TYPE_GYROSCOPE: call handleGyroscope()
+            // TODO Case 3: TYPE_MAGNETIC_FIELD: store magnetvalues, call updateCompass()
+        }
+    }
+
+    // pre-built: hangleAccelerometer
+    private fun handleAccelerometer(values: FloatArray) {
+        val x = values[0] - baselineX
+        val y = values[1] - baselineY
+        val z = values[2] - baselineZ
+        val magnitude = sqrt(x * x + y * y + z * z)
+        tvMotion.text = "Motion: ${classifyMotion(magnitude)}"
+
+        if (isCalibrating) {
+
+            calibrationSamples.add(floatArrayOf(values[0], values[1], values[2]))
+            if (calibrationSamples.size > 20) finishCalibration()
+        }
+    }
+
+    // Assignment: implement classifyMotion
+    // Return "Stationary", "Walking", or "Jogging" based on magnitude (m/s^2)
+    private fun classifyMotion(magnitude: Float): String {
+        return "Stationary"
+            // TODO: replace with when block using the threshold above
+    }
+
+    // Assignment: Implement handleGyroscope
+    // values[0]=pitch, values[1]=roll, values[2]=yaw
+    // tvGyro.text = "Rotation (pitch, roll, yaw): %.2f"
+    private fun handleGyroscope(vales: FloatArray) {
+
+    }
+
+    // Assignment
+    // Hint: SensorManager.getRotationMatrix(rotationMatrix, inclinationMatrix, accelValues, magnetValues)
+    //      SensorManager.getOrientation(rotationMatrix, orientation) orientation[0]
+    private fun updateCompass() {
+
+    }
+
+    // Assignment 2
+    // Hint: val entries = hourlySteps.mapIndexed { i, v -> barEntry(i.toFloat() v) }
+    //  color = 0xFF80DEEA,toInt(), dataset label = "Steps", Description = "Step count per hour"
+    private fun setupChart() {
+
+    }
+
+    // final report:
+    // Show tvAccuracy warning if accuracy == SENSOR_STATUS_UNRELIABLE or ACCURACY_LOW
+    override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {
+
+    }
+
+    // final report:
+    // Clear samples, set isCalibration = true, disable, Toast "hold the device steady"
+    private fun startCalibration() {
+
+    }
+
+    // final report
+    // Average calibrationSamples for each axis -> set baselineX, baselineY, baselineZ
+    private fun finishCalibration() {
+
+    }
+
+
+
+
+
+
 
 }
